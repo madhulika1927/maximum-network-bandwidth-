@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FLOWCORE — Network Flow Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark"><span></span><span></span><span></span></div>
+    <div><strong>FLOW<span>CORE</span></strong><small>NETWORK FLOW COMMAND CENTER</small></div>
+  </div>
+  <div class="status"><i></i> SYSTEM ONLINE <b>•</b> EDMONDS–KARP ENGINE</div>
+</header>
+
+<main class="shell">
+  <section class="hero">
+    <div>
+      <p class="eyebrow">DAA VISUAL LAB / 01</p>
+      <h1>Maximum <em>Network</em><br>Bandwidth</h1>
+      <p class="hero-copy">Route the highest possible data throughput from source to destination. Watch BFS discover augmenting paths and the residual network evolve in real time.</p>
+    </div>
+    <div class="hero-chip">
+      <span>ALGORITHM</span><strong>EDMONDS–KARP</strong><small>BFS + RESIDUAL GRAPH</small>
+    </div>
+  </section>
+
+  <section class="metrics">
+    <article class="metric primary"><span>MAX FLOW</span><strong id="maxFlow">—</strong><small>maximum transferable bandwidth</small></article>
+    <article class="metric"><span>AUGMENTATIONS</span><strong id="iterations">0</strong><small>successful BFS paths</small></article>
+    <article class="metric"><span>NETWORK EDGES</span><strong id="edgeCount">0</strong><small>directed connections</small></article>
+    <article class="metric"><span>COMPLEXITY</span><strong>O(VE²)</strong><small>Edmonds–Karp upper bound</small></article>
+  </section>
+
+  <section class="workspace">
+    <aside class="panel controls">
+      <div class="panel-head"><div><p class="eyebrow">CONTROL DECK</p><h2>Network Input</h2></div><button id="loadDemo" class="ghost">DEMO</button></div>
+
+      <div class="input-grid">
+        <label>Source<input id="source" value="{{ graph.source }}" maxlength="8"></label>
+        <label>Destination<input id="sink" value="{{ graph.sink }}" maxlength="8"></label>
+      </div>
+
+      <div class="section-label">ADD CONNECTION</div>
+      <div class="edge-form">
+        <input id="fromNode" placeholder="From" maxlength="8">
+        <span>→</span>
+        <input id="toNode" placeholder="To" maxlength="8">
+        <input id="capacity" type="number" min="1" placeholder="Mbps">
+        <button id="addEdge" class="add">+</button>
+      </div>
+
+      <div class="section-label row-label">ACTIVE CONNECTIONS <span id="connectionBadge">0</span></div>
+      <div id="edgeList" class="edge-list"></div>
+
+      <button id="runBtn" class="run-btn"><span>▶</span> RUN MAX-FLOW</button>
+      <button id="resetBtn" class="reset-btn">RESET SIMULATION</button>
+    </aside>
+
+    <section class="panel graph-panel">
+      <div class="panel-head">
+        <div><p class="eyebrow">LIVE TOPOLOGY</p><h2>Network Flow Map</h2></div>
+        <div class="legend"><span><i class="source-dot"></i>SOURCE</span><span><i class="sink-dot"></i>DESTINATION</span><span><i class="active-dot"></i>ACTIVE PATH</span></div>
+      </div>
+      <div id="graph" class="graph">
+        <div class="grid-overlay"></div>
+        <svg id="svg" aria-label="network graph"></svg>
+        <div id="nodes"></div>
+        <div id="packetLayer"></div>
+        <div class="graph-hint">Run the algorithm to visualize augmenting paths</div>
+      </div>
+    </section>
+
+    <aside class="panel inspector">
+      <div class="panel-head"><div><p class="eyebrow">ALGORITHM TELEMETRY</p><h2>Live Inspector</h2></div><span id="engineState" class="state">IDLE</span></div>
+      <div class="inspector-card">
+        <div class="tiny-title">CURRENT AUGMENTING PATH</div>
+        <div id="pathDisplay" class="path-display">—</div>
+      </div>
+      <div class="inspector-card">
+        <div class="tiny-title">BOTTLENECK CAPACITY</div>
+        <div id="bottleneck" class="big-number">— <small>Mbps</small></div>
+        <div class="bar"><span id="bottleneckBar"></span></div>
+      </div>
+      <div class="inspector-card">
+        <div class="tiny-title">BFS EXPLORATION</div>
+        <div id="bfsLog" class="bfs-log"><span class="muted">Waiting for execution…</span></div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="lower-grid">
+    <section class="panel playback">
+      <div class="panel-head"><div><p class="eyebrow">ALGORITHM PLAYBACK</p><h2>Augmentation Timeline</h2></div><div id="stepCounter">STEP 0 / 0</div></div>
+      <div class="timeline" id="timeline"></div>
+      <div class="play-controls">
+        <button id="prevBtn">← PREVIOUS</button><button id="playBtn" class="play">▶ PLAY STEPS</button><button id="nextBtn">NEXT →</button>
+        <label>SPEED <input id="speed" type="range" min="400" max="2000" step="100" value="1000"></label>
+      </div>
+    </section>
+    <section class="panel analytics">
+      <div class="panel-head"><div><p class="eyebrow">BANDWIDTH ANALYTICS</p><h2>Capacity Utilization</h2></div></div>
+      <div id="chart" class="chart"></div>
+    </section>
+  </section>
+
+  <section class="concept-strip">
+    <div><span>01</span><strong>Residual Graph</strong><p>Unused forward capacity and reversible flow.</p></div>
+    <div><span>02</span><strong>BFS Search</strong><p>Find the shortest augmenting path in edges.</p></div>
+    <div><span>03</span><strong>Bottleneck</strong><p>Minimum residual capacity limits each augmentation.</p></div>
+    <div><span>04</span><strong>Maximum Flow</strong><p>Stop when no source-to-sink residual path remains.</p></div>
+  </section>
+</main>
+
+<footer>FLOWCORE <span>×</span> DAA VISUAL LAB &nbsp; • &nbsp; Maximum Flow / Edmonds–Karp</footer>
+<script>
+window.DEFAULT_GRAPH = {{ graph | tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
